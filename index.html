@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NIMAT et fils sarl — Produits Naturels & Gourmands · Cotonou</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+:root {
+  --vert: #2F5D50;
+  --vert-dark: #1e3d35;
+  --vert-light: #e8f2ee;
+  --beige: #E8DFC8;
+  --brun: #8A5A3B;
+  --ivoire: #F5F1E8;
+  --or: #C6A75E;
+  --or-light: #f5edda;
+  --text: #2a1f10;
+  --text-light: #6a5a48;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; scroll-behavior:smooth; }
+
+body {
+  font-family: 'Jost', sans-serif;
+  background: var(--ivoire);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── NAVBAR ── */
+nav {
+  position: fixed; top:0; left:0; right:0; z-index:1000;
+  background: rgba(30,61,53,.97);
+  backdrop-filter: blur(10px);
+  padding: 0 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+  border-bottom: 2px solid var(--or);
+}
+.nav-logo { display:flex; align-items:center; gap:12px; }
+.nav-emblem {
+  width:40px; height:40px; border-radius:50%;
+  border:1.5px solid var(--or);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Playfair Display',serif; font-size:17px; font-weight:700; color:var(--or);
+}
+.nav-name { font-family:'Playfair Display',serif; font-size:17px; letter-spacing:2px; color:white; }
+.nav-sub { font-size:9px; letter-spacing:2px; color:var(--or); text-transform:uppercase; }
+.nav-links {
+  display:flex; gap:28px;
+}
+.nav-links a {
+  color:rgba(255,255,255,.7); text-decoration:none;
+  font-size:12px; letter-spacing:2px; text-transform:uppercase;
+  transition: color .2s;
+}
+.nav-links a:hover { color:var(--or); }
+.nav-cta {
+  background: var(--or);
+  color: var(--vert-dark) !important;
+  padding: 8px 18px;
+  border-radius: 4px;
+  font-weight: 600 !important;
+}
+.nav-cta:hover { background: #d4b870 !important; color: var(--vert-dark) !important; }
+
+/* Bouton menu hamburger */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: white;
+  cursor: pointer;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  background: var(--vert-dark);
+  display: flex; align-items: center;
+  position: relative; overflow: hidden;
+  padding-top: 64px;
+}
+.hero-bg {
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(198,167,94,.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(47,93,80,.4) 0%, transparent 50%);
+}
+/* Grain texture */
+.hero-bg::after {
+  content:'';
+  position:absolute; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+/* Decorative circles */
+.hero-circle {
+  position:absolute; border-radius:50%; border:1px solid rgba(198,167,94,.1);
+}
+.hero-circle-1 { width:600px; height:600px; top:-100px; right:-150px; }
+.hero-circle-2 { width:350px; height:350px; top:100px; right:50px; border-color:rgba(198,167,94,.07); }
+.hero-circle-3 { width:200px; height:200px; bottom:80px; left:10%; border-color:rgba(198,167,94,.12); }
+
+.hero-content {
+  position:relative; z-index:2;
+  max-width:1200px; margin:0 auto;
+  padding: 80px 60px;
+  display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;
+}
+.hero-left { }
+.hero-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(198,167,94,.15); border:1px solid rgba(198,167,94,.3);
+  padding:6px 16px; border-radius:30px; margin-bottom:28px;
+  font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--or);
+}
+.hero-badge::before { content:'🌿'; font-size:14px; }
+.hero-title {
+  font-family:'Playfair Display',serif;
+  font-size:58px; line-height:1.1;
+  color:white; margin-bottom:12px;
+  font-weight:700;
+}
+.hero-title span { color:var(--or); font-style:italic; }
+.hero-tagline {
+  font-size:15px; color:rgba(232,223,200,.7);
+  line-height:1.7; margin-bottom:36px;
+  max-width:420px;
+}
+.hero-or-line { width:50px; height:2px; background:var(--or); margin-bottom:28px; }
+.hero-btns { display:flex; gap:14px; flex-wrap:wrap; }
+.btn-primary {
+  background:var(--or); color:var(--vert-dark);
+  padding:14px 28px; border-radius:6px;
+  font-weight:600; font-size:13px; letter-spacing:1px;
+  text-decoration:none; text-transform:uppercase;
+  transition: all .2s;
+  box-shadow: 0 4px 20px rgba(198,167,94,.3);
+}
+.btn-primary:hover { background:#d4b870; transform:translateY(-1px); }
+.btn-secondary {
+  background:transparent; color:white;
+  border:1.5px solid rgba(255,255,255,.3);
+  padding:14px 28px; border-radius:6px;
+  font-size:13px; letter-spacing:1px; text-transform:uppercase;
+  text-decoration:none; transition: all .2s;
+}
+.btn-secondary:hover { border-color:var(--or); color:var(--or); }
+
+/* Hero right — decorative product cards */
+.hero-right {
+  display:grid; grid-template-columns:1fr 1fr; gap:16px;
+  position:relative;
+}
+.hero-card {
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(198,167,94,.2);
+  border-radius:14px; padding:22px;
+  backdrop-filter:blur(10px);
+  transition: transform .3s, border-color .3s;
+}
+.hero-card:hover { transform:translateY(-4px); border-color:rgba(198,167,94,.5); }
+.hero-card:first-child { grid-column: span 2; }
+.hero-card-icon { font-size:32px; margin-bottom:10px; }
+.hero-card-name {
+  font-family:'Playfair Display',serif;
+  font-size:16px; color:white; margin-bottom:4px;
+}
+.hero-card-desc { font-size:11px; color:rgba(232,223,200,.6); line-height:1.5; }
+.hero-card-tag {
+  display:inline-block; margin-top:10px;
+  background:rgba(198,167,94,.15); color:var(--or);
+  font-size:10px; padding:3px 10px; border-radius:20px;
+  font-weight:600; letter-spacing:1px;
+}
+.hero-card-wide { display:flex; gap:16px; align-items:center; }
+.hero-card-wide .hero-card-icon { font-size:40px; margin:0; }
+
+/* ── SECTION BASE ── */
+section { padding: 90px 60px; max-width:1200px; margin:0 auto; }
+.section-label {
+  font-size:11px; letter-spacing:3px; text-transform:uppercase;
+  color:var(--or); margin-bottom:12px; font-weight:600;
+}
+.section-title {
+  font-family:'Playfair Display',serif;
+  font-size:38px; color:var(--vert-dark); margin-bottom:16px;
+  line-height:1.2;
+}
+.section-title em { color:var(--or); font-style:italic; }
+.section-desc { font-size:15px; color:var(--text-light); line-height:1.7; max-width:550px; }
+.or-divider { width:50px; height:2px; background:var(--or); margin:18px 0; }
+
+/* ── PRODUITS ── */
+#produits { background:white; max-width:100%; padding:90px 0; }
+#produits .inner { max-width:1200px; margin:0 auto; padding:0 60px; }
+.produits-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:24px;
+  margin-top:48px;
+}
+.prod-card {
+  background:var(--ivoire);
+  border:1px solid rgba(47,93,80,.1);
+  border-radius:16px; padding:32px 28px;
+  transition: all .3s; cursor:default;
+  position:relative; overflow:hidden;
+}
+.prod-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:4px;
+  background:linear-gradient(90deg, var(--vert), var(--or));
+  transform:scaleX(0); transition:transform .3s; transform-origin:left;
+}
+.prod-card:hover { transform:translateY(-6px); box-shadow:0 12px 40px rgba(47,93,80,.12); }
+.prod-card:hover::before { transform:scaleX(1); }
+.prod-card-emoji { font-size:42px; margin-bottom:16px; }
+.prod-card-name {
+  font-family:'Playfair Display',serif;
+  font-size:20px; color:var(--vert-dark); margin-bottom:8px;
+}
+.prod-card-weight {
+  font-size:11px; color:var(--or); font-weight:600;
+  letter-spacing:2px; margin-bottom:12px;
+}
+.prod-card-desc { font-size:13px; color:var(--text-light); line-height:1.7; margin-bottom:16px; }
+.prod-tags { display:flex; flex-wrap:wrap; gap:6px; }
+.prod-tag {
+  background:var(--vert-light); color:var(--vert);
+  font-size:10px; font-weight:600; padding:3px 10px;
+  border-radius:20px; letter-spacing:.5px;
+}
+
+/* ── BOUTIQUE ── */
+#boutique { }
+.boutique-wrap {
+  display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;
+  margin-top:48px;
+}
+.boutique-iframe-wrap {
+  border-radius:16px; overflow:hidden;
+  box-shadow:0 8px 40px rgba(47,93,80,.15);
+  border:2px solid rgba(47,93,80,.15);
+  height:420px; position:relative;
+}
+.boutique-iframe-wrap iframe {
+  width:100%; height:100%; border:none;
+}
+.boutique-overlay {
+  position:absolute; inset:0;
+  background:rgba(30,61,53,.4);
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:14px; cursor:pointer;
+  transition: opacity .3s;
+}
+.boutique-overlay:hover { opacity:0; }
+.boutique-overlay-icon { font-size:48px; }
+.boutique-overlay-text {
+  font-family:'Playfair Display',serif;
+  font-size:18px; color:white; text-align:center;
+}
+.boutique-overlay-hint { font-size:12px; color:rgba(255,255,255,.7); letter-spacing:1px; }
+.boutique-info { }
+.boutique-features { margin-top:28px; display:flex; flex-direction:column; gap:14px; }
+.boutique-feat {
+  display:flex; gap:14px; align-items:flex-start;
+  padding:14px; border-radius:10px;
+  background:white; border:1px solid rgba(47,93,80,.08);
+}
+.boutique-feat-icon {
+  width:38px; height:38px; border-radius:8px;
+  background:var(--vert-light); color:var(--vert);
+  display:flex; align-items:center; justify-content:center;
+  font-size:18px; flex-shrink:0;
+}
+.boutique-feat-title { font-size:13px; font-weight:600; color:var(--vert-dark); margin-bottom:3px; }
+.boutique-feat-desc { font-size:12px; color:var(--text-light); line-height:1.5; }
+.boutique-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  margin-top:24px;
+  background:var(--vert); color:white;
+  padding:13px 24px; border-radius:8px;
+  font-size:13px; font-weight:600; letter-spacing:1px;
+  text-decoration:none; text-transform:uppercase;
+}
+
+/* Media queries pour responsive */
+@media (max-width: 900px) {
+  .hero-content {
+    grid-template-columns: 1fr;
+    padding: 40px 20px;
+    gap: 40px;
+  }
+  .produits-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  .boutique-wrap {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+}
+
+@media (max-width: 600px) {
+  nav {
+    padding: 0 20px;
+  }
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    background: rgba(30,61,53,0.95);
+    position: fixed;
+    top: 64px;
+    right: 0;
+    width: 200px;
+    padding: 20px;
+    border-left: 2px solid var(--or);
+    height: calc(100% - 64px);
+    overflow-y: auto;
+    z-index: 1001;
+  }
+  .menu-toggle {
+    display: block;
+  }
+  .nav-cta {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  .hero-title {
+    font-size: 36px;
+  }
+  .section-title {
+    font-size: 28px;
+  }
+  .produits-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .prod-card-name {
+    font-size: 16px;
+  }
+  section {
+    padding: 60px 20px;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">
+    <div class="nav-emblem">N</div>
+    <div>
+      <div class="nav-name">NIMAT et fils</div>
+      <div class="nav-sub">Produits Naturels</div>
+    </div>
+  </div>
+
+  <button id="menu-toggle" aria-label="Ouvrir le menu" class="menu-toggle">☰</button>
+
+  <div class="nav-links">
+    <a href="#produits">Produits</a>
+    <a href="#boutique">Boutique</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <a href="#boutique" class="nav-cta">Commander</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-badge">Nouveauté</div>
+      <h1 class="hero-title">Découvrez nos <span>Produits Naturels</span></h1>
+      <p class="hero-tagline">Des saveurs authentiques et gourmandes, directement de Cotonou.</p>
+      <div class="hero-btns">
+        <a href="#produits" class="btn-primary">Voir les produits</a>
+        <a href="#boutique" class="btn-secondary">Visiter la boutique</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-card hero-card-wide">
+        <div class="hero-card-icon">🌿</div>
+        <div>
+          <div class="hero-card-name">Miel Pur</div>
+          <div class="hero-card-desc">100% naturel, récolté localement.</div>
+          <div class="hero-card-tag">Bio</div>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-icon">🍯</div>
+        <div class="hero-card-name">Confiture Artisanale</div>
+        <div class="hero-card-desc">Fruits frais et recettes traditionnelles.</div>
+        <div class="hero-card-tag">Sans sucre ajouté</div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-icon">🌰</div>
+        <div class="hero-card-name">Noix de Cajou</div>
+        <div class="hero-card-desc">Croquantes et savoureuses, parfaites pour vos encas.</div>
+        <div class="hero-card-tag">Local</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUITS -->
+<section id="produits">
+  <div class="inner">
+    <div class="section-label">Nos produits</div>
+    <h2 class="section-title">Produits <em>phare</em></h2>
+    <p class="section-desc">Découvrez notre sélection de produits naturels et gourmands, soigneusement préparés pour vous.</p>
+    <div class="or-divider"></div>
+    <div class="produits-grid">
+      <div class="prod-card">
+        <div class="prod-card-emoji">🍯</div>
+        <div class="prod-card-name">Miel d’Acacia</div>
+        <div class="prod-card-weight">500g</div>
+        <div class="prod-card-desc">Miel doux et parfumé, récolté dans les forêts d’acacia.</div>
+        <div class="prod-tags">
+          <div class="prod-tag">Bio</div>
+          <div class="prod-tag">Local</div>
+        </div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-card-emoji">🍎</div>
+        <div class="prod-card-name">Confiture de Mangue</div>
+        <div class="prod-card-weight">350g</div>
+        <div class="prod-card-desc">Confiture artisanale avec des mangues fraîches.</div>
+        <div class="prod-tags">
+          <div class="prod-tag">Sans sucre ajouté</div>
+        </div>
+      </div>
+      <div class="prod-card">
+        <div class="prod-card-emoji">🌰</div>
+        <div class="prod-card-name">Noix de Cajou Grillées</div>
+        <div class="prod-card-weight">250g</div>
+        <div class="prod-card-desc">Noix de cajou grillées à la perfection.</div>
+        <div class="prod-tags">
+          <div class="prod-tag">Local</div>
+          <div class="prod-tag">Croquant</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOUTIQUE -->
+<section id="boutique">
+  <div class="inner boutique-wrap">
+    <div class="boutique-iframe-wrap">
+      <iframe src="https://votre-boutique-en-ligne.com" title="Boutique en ligne NIMAT et fils"></iframe>
+      <div class="boutique-overlay">
+        <div class="boutique-overlay-icon">🛒</div>
+        <div class="boutique-overlay-text">Visitez notre boutique en ligne</div>
+        <div class="boutique-overlay-hint">Cliquez pour explorer</div>
+      </div>
+    </div>
+    <div class="boutique-info">
+      <div class="section-label">Boutique</div>
+      <h2 class="section-title">Achetez <em>directement</em> chez nous</h2>
+      <p class="section-desc">Profitez d’une expérience d’achat simple et sécurisée avec livraison rapide.</p>
+      <div class="boutique-features">
+        <div class="boutique-feat">
+          <div class="boutique-feat-icon">🚚</div>
+          <div>
+            <div class="boutique-feat-title">Livraison rapide</div>
+            <div class="boutique-feat-desc">Recevez vos produits en un temps record.</div>
+          </div>
+        </div>
+        <div class="boutique-feat">
+          <div class="boutique-feat-icon">🔒</div>
+          <div>
+            <div class="boutique-feat-title">Paiement sécurisé</div>
+            <div class="boutique-feat-desc">Vos transactions sont protégées.</div>
+          </div>
+        </div>
+        <div class="boutique-feat">
+          <div class="boutique-feat-icon">📞</div>
+          <div>
+            <div class="boutique-feat-title">Support client</div>
+            <div class="boutique-feat-desc">Nous sommes là pour vous aider.</div>
+          </div>
+        </div>
+      </div>
+      <a href="#boutique" class="boutique-btn">Commander maintenant</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer style="text-align:center; padding:20px; background:#1e3d35; color:#f5f1e8; font-size:14px;">
+  &copy; 2026 NIMAT et fils sarl. Tous droits réservés.
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const menuToggle = document.getElementById('menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
+
+    menuToggle.addEventListener('click', function() {
+      if (navLinks.style.display === 'flex') {
+        navLinks.style.display = 'none';
+      } else {
+        navLinks.style.display = 'flex';
+      }
+    });
+
+    // Optionnel : fermer le menu quand on clique sur un lien (mobile)
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 600) {
+          navLinks.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
